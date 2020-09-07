@@ -67,6 +67,67 @@ void Tesseract_Clear(tesseract::TessBaseAPI* tesseract_ptr)
     tesseract_ptr->Clear();
 }
 
+int Tesseract_GetCount(tesseract::TessBaseAPI* tesseract_ptr, tesseract::PageIteratorLevel level) 
+{
+	int hits = 0;
+	
+	tesseract::ResultIterator* ri = tesseract_ptr->GetIterator();
+	if (ri != 0) {
+		do {
+			hits++;
+		} while (ri->Next(level));
+	}
+	
+	return hits;
+}
+
+void Tesseract_GetMatch(tesseract::TessBaseAPI* tesseract_ptr, tesseract::PageIteratorLevel level, int index, float* confidence, int* x1, int* y1, int* x2, int* y2) 
+{
+	tesseract::ResultIterator* ri = tesseract_ptr->GetIterator();
+	
+	if (ri != 0) {
+		int hits = 0;
+		do {
+			if (hits == index) {
+				*confidence = ri->Confidence(level);
+				ri->BoundingBox(level, x1, y1, x2, y2);
+				return;
+			}
+			hits++;
+		} while (ri->Next(level));
+	}
+}
+
+int Tesseract_GetLineCount(tesseract::TessBaseAPI* tesseract_ptr) 
+{
+	return Tesseract_GetCount(tesseract_ptr, tesseract::RIL_TEXTLINE);
+}
+
+int Tesseract_GetWordCount(tesseract::TessBaseAPI* tesseract_ptr) 
+{
+	return Tesseract_GetCount(tesseract_ptr, tesseract::RIL_WORD);
+}
+
+int Tesseract_GetCharacterCount(tesseract::TessBaseAPI* tesseract_ptr) 
+{
+	return Tesseract_GetCount(tesseract_ptr, tesseract::RIL_SYMBOL);
+}
+
+void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2) 
+{
+	Tesseract_GetMatch(tesseract_ptr, tesseract::RIL_TEXTLINE, index, confidence, x1, y1, x2, y2);
+}
+
+void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2) 
+{
+	Tesseract_GetMatch(tesseract_ptr, tesseract::RIL_WORD, index, confidence, x1, y1, x2, y2);
+}
+
+void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2) 
+{
+	Tesseract_GetMatch(tesseract_ptr, tesseract::RIL_SYMBOL, index, confidence, x1, y1, x2, y2); 
+}
+
 int GetPluginABIVersion()
 {
     return 2;
