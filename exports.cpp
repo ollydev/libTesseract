@@ -1,18 +1,18 @@
-/**  © 2014, Brandon T. All Rights Reserved.
+/**	 © 2014, Brandon T. All Rights Reserved.
   *
-  *  This file is part of the LibTesseract Library.
-  *  LibTesseract is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  *	 This file is part of the LibTesseract Library.
+  *	 LibTesseract is free software: you can redistribute it and/or modify
+  *	 it under the terms of the GNU General Public License as published by
+  *	 the Free Software Foundation, either version 3 of the License, or
+  *	 (at your option) any later version.
   *
-  *  LibTesseract is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  *	 LibTesseract is distributed in the hope that it will be useful,
+  *	 but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *	 GNU General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
+  *	 You should have received a copy of the GNU General Public License
+  *	 along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
   */
 
 #include "exports.h"
@@ -24,13 +24,13 @@ tesseract::TessBaseAPI* Tesseract_Create()
 
 void Tesseract_Delete(tesseract::TessBaseAPI* &tesseract_ptr)
 {
-    delete tesseract_ptr;
-    tesseract_ptr = NULL;
+	delete tesseract_ptr;
+	tesseract_ptr = NULL;
 }
 
 int Tesseract_Init(tesseract::TessBaseAPI* tesseract_ptr, const char* datapath, const char* language)
 {
-    return tesseract_ptr->Init(datapath, language);
+	return tesseract_ptr->Init(datapath, language);
 }
 
 void Tesseract_End(tesseract::TessBaseAPI* &tesseract_ptr)
@@ -45,15 +45,15 @@ void Tesseract_SetImage(tesseract::TessBaseAPI* tesseract_ptr, const unsigned ch
 
 const char* Tesseract_GetUTF8Text(tesseract::TessBaseAPI* tesseract_ptr, uint32_t* len)
 {
-    char* utf8_text_ptr = tesseract_ptr->GetUTF8Text();
-    *len = strlen(utf8_text_ptr);
-    return utf8_text_ptr;
+	char* utf8_text_ptr = tesseract_ptr->GetUTF8Text();
+	*len = strlen(utf8_text_ptr);
+	return utf8_text_ptr;
 }
 
 void Tesseract_FreeUTF8Text(char* &utf8_text_ptr)
 {
-    delete[] utf8_text_ptr;
-    utf8_text_ptr = NULL;
+	delete[] utf8_text_ptr;
+	utf8_text_ptr = NULL;
 }
 
 bool Tesseract_SetVariable(tesseract::TessBaseAPI* tesseract_ptr, const char* name, const char* value)
@@ -63,7 +63,7 @@ bool Tesseract_SetVariable(tesseract::TessBaseAPI* tesseract_ptr, const char* na
 
 void Tesseract_Clear(tesseract::TessBaseAPI* tesseract_ptr)
 {
-    tesseract_ptr->Clear();
+	tesseract_ptr->Clear();
 }
 
 int Tesseract_GetCount(tesseract::TessBaseAPI* tesseract_ptr, tesseract::PageIteratorLevel level) 
@@ -129,12 +129,12 @@ void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int inde
 
 int GetPluginABIVersion()
 {
-    return 2;
+	return 2;
 }
 
 int GetFunctionCount()
 {
-    return PascalExportCount;
+	return PascalExportCount;
 }
 
 int GetTypeCount()
@@ -144,17 +144,17 @@ int GetTypeCount()
 
 int GetFunctionInfo(int Index, void** Address, char** Definition)
 {
-    if (Index < PascalExportCount)
-    {
-        #if defined(_WIN32) || defined(_WIN64)
-        *Address = (void*)GetProcAddress(module, PascalExports[Index * 2]);
-        #else
-        *Address = (void*)dlsym(RTLD_DEFAULT, PascalExports[Index * 2]);
-        #endif
-        strcpy(*Definition, PascalExports[Index * 2 + 1]);
-        return Index;
-    }
-    return -1;
+	if (Index < PascalExportCount)
+	{
+		#if defined(_WIN32) || defined(_WIN64)
+		*Address = (void*)GetProcAddress(module, PascalExports[Index * 2]);
+		#else
+		*Address = (void*)dlsym(RTLD_DEFAULT, PascalExports[Index * 2]);
+		#endif
+		strcpy(*Definition, PascalExports[Index * 2 + 1]);
+		return Index;
+	}
+	return -1;
 }
 
 int GetTypeInfo(int Index, char** Type, char** Definition)

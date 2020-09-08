@@ -50,9 +50,5 @@ ENDIF()
 # ---------------------------- OUTPUT NAME ------------------------
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
-
-IF(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract64")
-ELSE()
-  set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract32")
-ENDIF()
+set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".plugin")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract")

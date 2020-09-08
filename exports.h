@@ -1,18 +1,18 @@
-/**  © 2014, Brandon T. All Rights Reserved.
+/**	 © 2014, Brandon T. All Rights Reserved.
   *
-  *  This file is part of the LibTesseract Library.
-  *  LibTesseract is free software: you can redistribute it and/or modify
-  *  it under the terms of the GNU General Public License as published by
-  *  the Free Software Foundation, either version 3 of the License, or
-  *  (at your option) any later version.
+  *	 This file is part of the LibTesseract Library.
+  *	 LibTesseract is free software: you can redistribute it and/or modify
+  *	 it under the terms of the GNU General Public License as published by
+  *	 the Free Software Foundation, either version 3 of the License, or
+  *	 (at your option) any later version.
   *
-  *  LibTesseract is distributed in the hope that it will be useful,
-  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  *  GNU General Public License for more details.
+  *	 LibTesseract is distributed in the hope that it will be useful,
+  *	 but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *	 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *	 GNU General Public License for more details.
   *
-  *  You should have received a copy of the GNU General Public License
-  *  along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
+  *	 You should have received a copy of the GNU General Public License
+  *	 along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
   */
 
 #ifndef EXPORTS_HXX_INCLUDED
@@ -60,27 +60,27 @@ static const long int PascalTypeCount = sizeof(PascalTypes) / (sizeof(PascalType
 
 extern "C"
 {
-    EXPORT tesseract::TessBaseAPI* Tesseract_Create();
-    EXPORT void Tesseract_Delete(tesseract::TessBaseAPI* &tesseract_ptr);
-    EXPORT int Tesseract_Init(tesseract::TessBaseAPI* tesseract_ptr, const char* datapath, const char* language);
-    EXPORT void Tesseract_End(tesseract::TessBaseAPI* &tesseract_ptr);
-    EXPORT void Tesseract_SetImage(tesseract::TessBaseAPI* tesseract_ptr, const unsigned char* imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line);
-    EXPORT const char* Tesseract_GetUTF8Text(tesseract::TessBaseAPI* tesseract_ptr, uint32_t* len);
-    EXPORT void Tesseract_FreeUTF8Text(char* &utf8_text_ptr);
-    EXPORT bool Tesseract_SetVariable(tesseract::TessBaseAPI* tesseract_ptr, const char* name, const char* value);
-    EXPORT void Tesseract_Clear(tesseract::TessBaseAPI* tesseract_ptr);
-    EXPORT int Tesseract_GetLineCount(tesseract::TessBaseAPI* tesseract_ptr); 
-    EXPORT int Tesseract_GetWordCount(tesseract::TessBaseAPI* tesseract_ptr); 
-    EXPORT int Tesseract_GetCharacterCount(tesseract::TessBaseAPI* tesseract_ptr); 
-    EXPORT void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2); 
-    EXPORT void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2); 
-    EXPORT void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2);
+	EXPORT tesseract::TessBaseAPI* Tesseract_Create();
+	EXPORT void Tesseract_Delete(tesseract::TessBaseAPI* &tesseract_ptr);
+	EXPORT int Tesseract_Init(tesseract::TessBaseAPI* tesseract_ptr, const char* datapath, const char* language);
+	EXPORT void Tesseract_End(tesseract::TessBaseAPI* &tesseract_ptr);
+	EXPORT void Tesseract_SetImage(tesseract::TessBaseAPI* tesseract_ptr, const unsigned char* imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line);
+	EXPORT const char* Tesseract_GetUTF8Text(tesseract::TessBaseAPI* tesseract_ptr, uint32_t* len);
+	EXPORT void Tesseract_FreeUTF8Text(char* &utf8_text_ptr);
+	EXPORT bool Tesseract_SetVariable(tesseract::TessBaseAPI* tesseract_ptr, const char* name, const char* value);
+	EXPORT void Tesseract_Clear(tesseract::TessBaseAPI* tesseract_ptr);
+	EXPORT int Tesseract_GetLineCount(tesseract::TessBaseAPI* tesseract_ptr); 
+	EXPORT int Tesseract_GetWordCount(tesseract::TessBaseAPI* tesseract_ptr); 
+	EXPORT int Tesseract_GetCharacterCount(tesseract::TessBaseAPI* tesseract_ptr); 
+	EXPORT void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2); 
+	EXPORT void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2); 
+	EXPORT void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2);
 
-    EXPORT int GetPluginABIVersion();
-    EXPORT int GetFunctionCount();
-    EXPORT int GetTypeCount();
-    EXPORT int GetFunctionInfo(int Index, void** Address, char** Definition);
-    EXPORT int GetTypeInfo(int Index, char** Type, char** Definition);
+	EXPORT int GetPluginABIVersion();
+	EXPORT int GetFunctionCount();
+	EXPORT int GetTypeCount();
+	EXPORT int GetFunctionInfo(int Index, void** Address, char** Definition);
+	EXPORT int GetTypeInfo(int Index, char** Type, char** Definition);
 }
 
 #endif // EXPORTS_HXX_INCLUDED
