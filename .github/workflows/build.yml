@@ -13,13 +13,15 @@ jobs:
           - os: windows-latest
             name: 'Windows 64'
             compiler: 'msvc'
+            generator: 'Visual Studio 16 2019'
             platform: 'x64'
             args: '-win-mt'
-            output: 'libtesseract64.dll'
+            output: 'Release/libtesseract64.dll'
 
           - os: ubuntu-latest
             name: 'Ubuntu 64'
             compiler: 'gnu'
+            generator: 'Unix Makefiles'
             platform: 'x64'
             args: ''
             output: 'libtesseract64.so'
@@ -27,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.3.2
       - uses: egorpugin/sw-action@master
-      - uses: ilammy/msvc-dev-cmd@v1
+      #- uses: ilammy/msvc-dev-cmd@v1
 
       - name: Cache
         id: cache
@@ -59,16 +61,11 @@ jobs:
           find "$tesseract" -name "*.h*" -exec cp "{}" tesseract/ \;
           find "storage/pkg/" -wholename "*tesseract/version.h" -exec cp "{}" tesseract/ \;
 
-      - name: Build Windows Plugin
-        if: matrix.config.os == 'windows-latest'
+      - name: Build Plugin
+        shell: bash
         run: |
-          cl.exe /Fe${{ matrix.config.output }} /MT /LD /O2 -I. main.cpp exports.cpp user32.lib advapi32.lib libs/*.lib
-
-      - name: Build Linux Plugin
-        if: matrix.config.os == 'ubuntu-latest'
-        run: | 
-          g++ -c -fPIC -I. -O2 -fvisibility=hidden main.cpp exports.cpp
-          g++ -o ${{ matrix.config.output }} -Wl,--whole-archive libs/*.a -Wl,--no-whole-archive -lpthread -shared main.o
+          cmake -S . -G "${{ matrix.config.generator }}"
+          cmake --build .  --config Release
 
       - uses: actions/upload-artifact@v2
         with:
