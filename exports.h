@@ -15,20 +15,19 @@
   *  along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
   */
 
-
 #ifndef EXPORTS_HXX_INCLUDED
 #define EXPORTS_HXX_INCLUDED
 
 #include <tesseract/baseapi.h>
 #include <leptonica/allheaders.h>
 
-#if defined _WIN32 || defined _WIN64
-#define EXPORT __declspec(dllexport)
+#if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
-extern HINSTANCE hInstance;
+#define EXPORT __declspec(dllexport)
+extern HMODULE module;
 #else
-#define EXPORT
 #include <dlfcn.h>
+#define EXPORT [[gnu::visibility("default")]]
 #endif
 
 static const char* PascalExports[] =
@@ -37,7 +36,7 @@ static const char* PascalExports[] =
 	(char*)"Tesseract_Delete", (char*)"Procedure Tesseract_Delete(var Tesseract: Pointer);",
 	(char*)"Tesseract_Init", (char*)"Function Tesseract_Init(Tesseract: Pointer; datapath, language: String): Integer;",
 	(char*)"Tesseract_End", (char*)"Procedure Tesseract_End(var Tesseract: Pointer);",
-	(char*)"Tesseract_SetImage", (char*)"Procedure Tesseract_SetImage(Tesseract: Pointer; const imagedata: Pointer; width, height, bytes_per_pixel, bytes_per_line: Integer);",
+	(char*)"Tesseract_SetImage", (char*)"Procedure Tesseract_SetImage(Tesseract: Pointer; const ImageData: Pointer; Width, Height, BytesPerPixel, BytesPerLine: Integer);",
 	(char*)"Tesseract_GetUTF8Text", (char*)"Function Tesseract_GetUTF8Text(Tesseract: Pointer; var len: UInt32): PChar;",
 	(char*)"Tesseract_FreeUTF8Text", (char*)"Procedure Tesseract_FreeUTF8Text(var utf8_text_ptr: PChar);",
 	(char*)"Tesseract_SetVariable", (char*)"Function Tesseract_SetVariable(Tesseract: Pointer; name, value: String): Boolean;",

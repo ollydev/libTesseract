@@ -15,40 +15,16 @@
   *  along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
   */
 
+#include "exports.h"
 
-#if defined _WIN32 || defined _WIN64
-#include <windows.h>
+#if defined(_WIN32) || defined(_WIN64)
 
-HINSTANCE hInstance;
+HMODULE module = nullptr;
 
-extern "C" __declspec(dllexport) BOOL __stdcall DllMain(HINSTANCE hinstDLL, DWORD fdwReason, void* lpvReserved)
+extern "C" EXPORT BOOL APIENTRY DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
-    switch (fdwReason)
-    {
-        case DLL_PROCESS_ATTACH:
-            hInstance = hinstDLL;
-            break;
+	module = hinstDLL;
 
-        case DLL_PROCESS_DETACH:
-            break;
-
-        case DLL_THREAD_ATTACH:
-            break;
-
-        case DLL_THREAD_DETACH:
-            break;
-    }
-    return true;
-}
-#else
-extern "C" void __attribute__((constructor)) load();
-extern "C" void __attribute__((constructor)) unload();
-
-extern "C" void load()
-{
-}
-
-extern "C" void unload()
-{
+	return TRUE;
 }
 #endif

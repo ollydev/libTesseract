@@ -15,7 +15,6 @@
   *  along with LibTesseract.  If not, see <http://www.gnu.org/licenses/>.
   */
 
-
 #include "exports.h"
 
 tesseract::TessBaseAPI* Tesseract_Create()
@@ -147,8 +146,8 @@ int GetFunctionInfo(int Index, void** Address, char** Definition)
 {
     if (Index < PascalExportCount)
     {
-        #if defined _WIN32 || defined _WIN64
-        *Address = (void*)GetProcAddress(hInstance, PascalExports[Index * 2]);
+        #if defined(_WIN32) || defined(_WIN64)
+        *Address = (void*)GetProcAddress(module, PascalExports[Index * 2]);
         #else
         *Address = (void*)dlsym(RTLD_DEFAULT, PascalExports[Index * 2]);
         #endif
