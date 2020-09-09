@@ -2,8 +2,15 @@ cmake_minimum_required(VERSION 3.15)
 project(Tesseract DESCRIPTION "tesseract")
 
 SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_CXX_STANDARD 20)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
 
 # ----------------------------- LINKER -----------------------------
+
+file(GLOB TESSERACT_LIBRARIES
+    "libs/*.a"
+    "libs/*.lib"
+    )
 
 IF(WIN32)
     set(EXTRA_LIBRARIES
@@ -27,11 +34,6 @@ set(INCLUDE_DIRECTORIES
         .
    )
 
-file(GLOB TESSERACT_LIBRARIES
-    "libs/*.a"
-    "libs/*.lib"
-    )
-
 # ---------------------------- COMPILE ----------------------------
 
 add_library(${PROJECT_NAME} SHARED ${SOURCE_LIST})
@@ -40,6 +42,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRECTORIES})
 
 IF(WIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE /MT)
+    target_link_libraries(${PROJECT_NAME} ${TESSERACT_LIBRARIES} ${EXTRA_LIBRARIES})
+ELSEIF(APPLE)
+    target_compile_options(${PROJECT_NAME} PRIVATE -O3 -fvisibility=hidden)
+    target_link_options(${PROJECT_NAME} PRIVATE -s)
     target_link_libraries(${PROJECT_NAME} ${TESSERACT_LIBRARIES} ${EXTRA_LIBRARIES})
 ELSE()
     target_compile_options(${PROJECT_NAME} PRIVATE -O3 -fvisibility=hidden)
@@ -50,5 +56,5 @@ ENDIF()
 # ---------------------------- OUTPUT NAME ------------------------
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
-set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".plugin")
+set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".binary")
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract")

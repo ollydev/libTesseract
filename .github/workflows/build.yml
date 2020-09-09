@@ -31,6 +31,12 @@ jobs:
             output: 'libtesseract64.so'
             cmake_args: '-G "Unix Makefiles"'
             sw_args: '-platform x64'
+            
+          - os: macos-latest
+            name: 'MacOS 64'
+            output: 'libtesseract64.dylib'
+            cmake_args: '-G "Unix Makefiles"'
+            sw_args: '-platform x64'
 
     steps:
       - uses: actions/checkout@v2
@@ -46,7 +52,6 @@ jobs:
       - name: Build Tesseract
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          ./sw -self-upgrade || true
           ./sw build ${{ matrix.config.sw_args }} -storage-dir=storage -static -static-dependencies -config r org.sw.demo.google.tesseract.tesseract-master
 
       - name: Extract Headers & Libraries
@@ -56,21 +61,20 @@ jobs:
           find "storage/pkg/" -name "*.lib" -exec cp "{}" "libs" \;
           
           mkdir -p leptonica
-          leptonica=$(find "storage/pkg/" -name "allheaders.h" -printf '%h/\n')
+          leptonica=$(find "storage/pkg/" -name "allheaders.h" -exec dirname {} \; -quit)
           find "$leptonica" -name "*.h*" -exec cp "{}" leptonica/ \;
           find "storage/pkg/" -name "*endianness.h*" -exec cp "{}" leptonica/ \;
           
           mkdir -p tesseract
-          tesseract=$(find "storage/pkg/" -name "baseapi.h" -printf '%h/\n')
+          tesseract=$(find "storage/pkg/" -name "baseapi.h" -exec dirname {} \; -quit)
           find "$tesseract" -name "*.h*" -exec cp "{}" tesseract/ \;
           find "storage/pkg/" -wholename "*tesseract/version.h" -exec cp "{}" tesseract/ \;
 
       - name: Build Plugin
-        continue-on-error: true
         run: |
           cmake -S . ${{ matrix.config.cmake_args }}
           cmake --build .  --config Release
-          find . -name libtesseract.plugin -exec cp "{}" ${{ matrix.config.output }} \;
+          find . -name libtesseract.binary -exec cp "{}" ${{ matrix.config.output }} \;
 
       - uses: actions/upload-artifact@v2
         with:
