@@ -3,7 +3,7 @@ project(Tesseract DESCRIPTION "tesseract")
 
 SET(CMAKE_BUILD_TYPE Release)
 SET(CMAKE_CXX_STANDARD 20)
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
+SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
 
 # ----------------------------- LINKER -----------------------------
 

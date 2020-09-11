@@ -16,9 +16,9 @@ void Tesseract_Clear(tesseract::TessBaseAPI* tesseract_ptr);
 int Tesseract_GetLineCount(tesseract::TessBaseAPI* tesseract_ptr); 
 int Tesseract_GetWordCount(tesseract::TessBaseAPI* tesseract_ptr); 
 int Tesseract_GetCharacterCount(tesseract::TessBaseAPI* tesseract_ptr); 
-void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2); 
-void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2); 
-void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, float* confidence, int* x1, int* y1, int* x2, int* y2);
+void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2); 
+void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2); 
+void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2);
 ```
 
 See the [Github Action](https://github.com/ollydev/libTesseract/blob/master/.github/workflows/build.yml) to see how this is built. Thanks to [SoftwareNetwork](https://github.com/SoftwareNetwork/sw) for making this so simple! 
