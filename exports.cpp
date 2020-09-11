@@ -71,7 +71,7 @@ int Tesseract_GetCount(tesseract::TessBaseAPI* tesseract_ptr, tesseract::PageIte
 	int hits = 0;
 	
 	tesseract::ResultIterator* ri = tesseract_ptr->GetIterator();
-	if (ri != 0) {
+	if ((ri != 0) & (!ri->Empty(level))) {
 		do {
 			hits++;
 		} while (ri->Next(level));
@@ -82,10 +82,10 @@ int Tesseract_GetCount(tesseract::TessBaseAPI* tesseract_ptr, tesseract::PageIte
 
 void Tesseract_GetMatch(tesseract::TessBaseAPI* tesseract_ptr, tesseract::PageIteratorLevel level, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2) 
 {
+	int hits = 0;
+
 	tesseract::ResultIterator* ri = tesseract_ptr->GetIterator();
-	
-	if (ri != 0) {
-		int hits = 0;
+	if ((ri != 0) & (!ri->Empty(level))) {
 		do {
 			if (hits == index) {
 				text = ri->GetUTF8Text(level);
@@ -114,6 +114,11 @@ int Tesseract_GetCharacterCount(tesseract::TessBaseAPI* tesseract_ptr)
 	return Tesseract_GetCount(tesseract_ptr, tesseract::RIL_SYMBOL);
 }
 
+int Tesseract_GetBlockCount(tesseract::TessBaseAPI* tesseract_ptr) 
+{
+	return Tesseract_GetCount(tesseract_ptr, tesseract::RIL_BLOCK);
+}
+
 void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2) 
 {
 	Tesseract_GetMatch(tesseract_ptr, tesseract::RIL_TEXTLINE, index, text, len, confidence, x1, y1, x2, y2);
@@ -127,6 +132,11 @@ void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, ch
 void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2) 
 {
 	Tesseract_GetMatch(tesseract_ptr, tesseract::RIL_SYMBOL, index, text, len, confidence, x1, y1, x2, y2); 
+}
+
+void Tesseract_GetBlockMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2) 
+{
+	Tesseract_GetMatch(tesseract_ptr, tesseract::RIL_BLOCK, index, text, len, confidence, x1, y1, x2, y2); 
 }
 
 int GetPluginABIVersion()

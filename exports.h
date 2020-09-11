@@ -40,9 +40,11 @@ static const char* PascalExports[] =
 	(char*)"Tesseract_FreeUTF8Text",      (char*)"procedure Tesseract_FreeUTF8Text(var Text: PChar);",
 	(char*)"Tesseract_SetVariable",       (char*)"function Tesseract_SetVariable(Tesseract: Pointer; name, value: String): Boolean;",
 	(char*)"Tesseract_Clear",             (char*)"procedure Tesseract_Clear(Tesseract: Pointer);",
+	(char*)"Tesseract_GetBlockCount",     (char*)"function Tesseract_GetBlockCount(Tesseract: Pointer): Int32;",
 	(char*)"Tesseract_GetLineCount",      (char*)"function Tesseract_GetLineCount(Tesseract: Pointer): Int32;",
 	(char*)"Tesseract_GetWordCount",      (char*)"function Tesseract_GetWordCount(Tesseract: Pointer): Int32;",
 	(char*)"Tesseract_GetCharacterCount", (char*)"function Tesseract_GetCharacterCount(Tesseract: Pointer): Int32;",
+	(char*)"Tesseract_GetBlockMatch",     (char*)"procedure Tesseract_GetBlockMatch(Tesseract: Pointer; Index: Int32; var Text: PChar; var Len: Int32; var Confidence: Single; var X1, Y1, X2, Y2: Int32);",
 	(char*)"Tesseract_GetLineMatch",      (char*)"procedure Tesseract_GetLineMatch(Tesseract: Pointer; Index: Int32; var Text: PChar; var Len: Int32; var Confidence: Single; var X1, Y1, X2, Y2: Int32);",
 	(char*)"Tesseract_GetWordMatch",      (char*)"procedure Tesseract_GetWordMatch(Tesseract: Pointer; Index: Int32; var Text: PChar; var Len: Int32; var Confidence: Single; var X1, Y1, X2, Y2: Int32);",
 	(char*)"Tesseract_GetCharacterMatch", (char*)"procedure Tesseract_GetCharacterMatch(Tesseract: Pointer; Index: Int32; var Text: PChar; var Len: Int32; var Confidence: Single; var X1, Y1, X2, Y2: Int32);",
@@ -67,9 +69,11 @@ extern "C"
 	EXPORT void Tesseract_FreeUTF8Text(char* &utf8_text_ptr);
 	EXPORT bool Tesseract_SetVariable(tesseract::TessBaseAPI* tesseract_ptr, const char* name, const char* value);
 	EXPORT void Tesseract_Clear(tesseract::TessBaseAPI* tesseract_ptr);
+	EXPORT int Tesseract_GetBlockCount(tesseract::TessBaseAPI* tesseract_ptr);
 	EXPORT int Tesseract_GetLineCount(tesseract::TessBaseAPI* tesseract_ptr); 
 	EXPORT int Tesseract_GetWordCount(tesseract::TessBaseAPI* tesseract_ptr); 
 	EXPORT int Tesseract_GetCharacterCount(tesseract::TessBaseAPI* tesseract_ptr); 
+	EXPORT void Tesseract_GetBlockMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2); 
 	EXPORT void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2); 
 	EXPORT void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2); 
 	EXPORT void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2);
