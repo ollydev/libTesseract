@@ -36,7 +36,7 @@ jobs:
             name: 'MacOS 64'
             output: 'libtesseract64.dylib'
             cmake_args: '-G "Unix Makefiles"'
-            sw_args: '-platform x64'
+            sw_args: '-platform x64 -os macos-10.13'
 
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +47,7 @@ jobs:
         uses: actions/cache@v2.1.1
         with:
           path: storage
-          key: ${{ matrix.config.name }}
+          key: ${{ matrix.config.name }}${{ matrix.config.sw_args }}
 
       - name: Build Tesseract
         if: steps.cache.outputs.cache-hit != 'true'
