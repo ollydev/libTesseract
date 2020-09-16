@@ -18,7 +18,6 @@ jobs:
             output: 'libtesseract32.dll'
             cmake_args: '-G "Visual Studio 16 2019" -A Win32'
             sw_args: '-platform x86 -win-mt'
-            platform: 'x32'
 
           - os: windows-latest
             name: 'Windows 64'
@@ -40,37 +39,43 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:  
+          submodules: true
+      
       - uses: egorpugin/sw-action@master
-
+      
       - name: Cache
         id: cache
         uses: actions/cache@v2.1.1
         with:
           path: storage
-          key: ${{ matrix.config.name }}${{ matrix.config.sw_args }}
+          key: ${{ matrix.config.os }}${{ matrix.config.sw_args }}
 
       - name: Build Tesseract
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          ./sw build ${{ matrix.config.sw_args }} -storage-dir=storage -static -static-dependencies -config r org.sw.demo.google.tesseract.tesseract-master
-
+          mv -f sw.cpp tesseract/sw.cpp
+          ./sw ${{ matrix.config.sw_args }} -d tesseract -storage-dir ../storage -static -static-dependencies -config r build
+          mv tesseract storage/pkg
+          
       - name: Extract Headers & Libraries
+        continue-on-error: true
         run: |
           mkdir -p libs
+          mkdir -p headers/tesseract
+          mkdir -p headers/leptonica
+          
           find "storage/pkg/" -name "*.a" -exec cp "{}" "libs" \;
           find "storage/pkg/" -name "*.lib" -exec cp "{}" "libs" \;
           
-          mkdir -p leptonica
-          leptonica=$(find "storage/pkg/" -name "allheaders.h" -exec dirname {} \; -quit)
-          find "$leptonica" -name "*.h*" -exec cp "{}" leptonica/ \;
-          find "storage/pkg/" -name "*endianness.h*" -exec cp "{}" leptonica/ \;
+          find "storage/pkg/tesseract/include" -name "*.h" -exec cp "{}" headers/tesseract/ \;
+          find "storage/pkg/tesseract" -name "version.h" -exec cp "{}" headers/tesseract/ \; -quit
           
-          mkdir -p tesseract
-          tesseract=$(find "storage/pkg/" -name "baseapi.h" -exec dirname {} \; -quit)
-          find "$tesseract" -name "*.h*" -exec cp "{}" tesseract/ \;
-          find "storage/pkg/" -wholename "*tesseract/version.h" -exec cp "{}" tesseract/ \;
+          leptonica=$(find "storage/pkg/" -name "*leptonica*" -exec dirname {} \; -quit)/../../../../
+          find "$leptonica" -name "*.h" -exec cp "{}" headers/leptonica/ \;
 
       - name: Build Plugin
+        continue-on-error: true
         run: |
           cmake -S . ${{ matrix.config.cmake_args }}
           cmake --build .  --config Release

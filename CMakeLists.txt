@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.15)
 project(Tesseract DESCRIPTION "tesseract")
 
-SET(CMAKE_BUILD_TYPE Release)
 SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
 
 # ----------------------------- LINKER -----------------------------
 
-file(GLOB TESSERACT_LIBRARIES
-    "libs/*.a"
-    "libs/*.lib"
+file(
+	GLOB TESSERACT_LIBRARIES
+        "libs/*.a"
+        "libs/*.lib"
     )
 
 IF(WIN32)
@@ -31,7 +31,7 @@ set(SOURCE_LIST
    )
 
 set(INCLUDE_DIRECTORIES
-        .
+        headers
    )
 
 # ---------------------------- COMPILE ----------------------------
