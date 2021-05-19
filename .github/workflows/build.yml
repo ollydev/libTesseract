@@ -38,7 +38,7 @@ jobs:
             sw_args: '-platform x64 -os macos-10.13'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
         with:  
           submodules: true
       
@@ -46,7 +46,7 @@ jobs:
       
       - name: Cache
         id: cache
-        uses: actions/cache@v2.1.1
+        uses: actions/cache@v2.1.5
         with:
           path: storage
           key: ${{ matrix.config.os }}${{ matrix.config.sw_args }}
@@ -54,9 +54,7 @@ jobs:
       - name: Build Tesseract
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          mv -f sw.cpp tesseract/sw.cpp
-          ./sw ${{ matrix.config.sw_args }} -d tesseract -storage-dir ../storage -static -static-dependencies -config r build
-          mv tesseract storage/pkg
+          ./sw build ${{ matrix.config.sw_args }} -storage-dir=storage -static -static-dependencies -config r org.sw.demo.google.tesseract.tesseract-master
           
       - name: Extract Headers & Libraries
         continue-on-error: true
@@ -68,11 +66,16 @@ jobs:
           find "storage/pkg/" -name "*.a" -exec cp "{}" "libs" \;
           find "storage/pkg/" -name "*.lib" -exec cp "{}" "libs" \;
           
-          find "storage/pkg/tesseract/include" -name "*.h" -exec cp "{}" headers/tesseract/ \;
-          find "storage/pkg/tesseract" -name "version.h" -exec cp "{}" headers/tesseract/ \; -quit
+          tesseract=$(find "storage/pkg/" -name "baseapi.h" -exec dirname {} \; -quit)
+          find "$tesseract" -name "*.h*" -exec cp "{}" headers/tesseract/ \;
+          find "storage/pkg/" -wholename "*tesseract/version.h" -exec cp "{}" headers/tesseract/ \;
           
           leptonica=$(find "storage/pkg/" -name "*leptonica*" -exec dirname {} \; -quit)/../../../../
           find "$leptonica" -name "*.h" -exec cp "{}" headers/leptonica/ \;
+          
+          # Delete crap that causes linking errors
+          rm libs/*xxHash*
+          rm libs/*boost.thread*
 
       - name: Build Plugin
         continue-on-error: true
@@ -81,6 +84,6 @@ jobs:
           cmake --build .  --config Release
           find . -name libtesseract.binary -exec cp "{}" ${{ matrix.config.output }} \;
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v2.2.3
         with:
           path: ${{ matrix.config.output }}
