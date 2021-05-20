@@ -1,6 +1,8 @@
-## libTesseract
+Downloads are available here https://github.com/ollydev/libtesseract/releases
 
-This is a shared library (dll, so, dylib) which exports basic [Tesseract-OCR](https://github.com/tesseract-ocr/tesseract) functions. Tesseract and it's dependencies have been statically linked so no other libraries are required.
+-----
+
+This is a shared library (dll, so, dylib) which exports basic C [Tesseract-OCR](https://github.com/tesseract-ocr/tesseract) functions for basic text recognition. Tesseract and it's dependencies have been statically linked so only a single library is required.
 
 The following methods are exported:
 ```c++
@@ -20,5 +22,11 @@ void Tesseract_GetLineMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, ch
 void Tesseract_GetWordMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2); 
 void Tesseract_GetCharacterMatch(tesseract::TessBaseAPI* tesseract_ptr, int index, char* &text, int* len, float* confidence, int* x1, int* y1, int* x2, int* y2);
 ```
+Example Pascal header:
 
-See the [Github Action](https://github.com/ollydev/libTesseract/blob/master/.github/workflows/build.yml) to see how this is built. Thanks to [SoftwareNetwork](https://github.com/SoftwareNetwork/sw) for making this so simple! 
+```pascal
+function Tesseract_Init(ptr: Pointer; datapath, language: PChar): Int32; external 'libtesseract32.dll'
+```
+----
+
+See the [Github Action](https://github.com/ollydev/libTesseract/blob/master/.github/workflows/build.yml) to see how this is built. Thanks to [SoftwareNetwork](https://github.com/SoftwareNetwork/sw) for making this a lot easier than it used to be. 
