@@ -18,10 +18,14 @@
 #ifndef EXPORTS_INCLUDED
 #define EXPORTS_INCLUDED
 
-#include <tesseract/baseapi.h>
-
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#endif
+
+#include <tesseract/baseapi.h>
+#include <tesseract/capi.h>
+
+#if defined(_WIN32) || defined(_WIN64)
 #define EXPORT __declspec(dllexport)
 extern HMODULE module;
 #else

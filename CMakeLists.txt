@@ -1,60 +1,30 @@
-cmake_minimum_required(VERSION 3.15)
-project(Tesseract DESCRIPTION "tesseract")
+cmake_minimum_required(VERSION 3.2)
+project(Tesseract DESCRIPTION "libtesseract")
 
 SET(CMAKE_CXX_STANDARD 20)
 SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE)
 
-# ----------------------------- LINKER -----------------------------
-
-file(
-	GLOB TESSERACT_LIBRARIES
+file(GLOB TESSERACT_LIBRARIES
         "libs/*.a"
         "libs/*.lib"
     )
 
-IF(WIN32)
-    set(EXTRA_LIBRARIES
-            user32
-            advapi32
-       )
-ELSE()
-    set(EXTRA_LIBRARIES
-            pthread
-       )
-ENDIF()
+add_library(${PROJECT_NAME} SHARED main.cpp exports.cpp)
 
-# ----------------------------- SOURCES -----------------------------
-
-set(SOURCE_LIST
-        main.cpp 
-        exports.cpp
-   )
-
-set(INCLUDE_DIRECTORIES
-        headers
-   )
-
-# ---------------------------- COMPILE ----------------------------
-
-add_library(${PROJECT_NAME} SHARED ${SOURCE_LIST})
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRECTORIES})
+target_include_directories(${PROJECT_NAME} PRIVATE headers)
 
 IF(WIN32)
-    target_compile_options(${PROJECT_NAME} PRIVATE /MT)
-    target_link_libraries(${PROJECT_NAME} ${TESSERACT_LIBRARIES} ${EXTRA_LIBRARIES})
+	target_link_libraries(${PROJECT_NAME} -static -static-libgcc -static-libstdc++ -Wl,--whole-archive -Wl,--export-all-symbols ${TESSERACT_LIBRARIES} -Wl,--no-whole-archive ws2_32)
 ELSEIF(APPLE)
-    target_compile_options(${PROJECT_NAME} PRIVATE -O3 -fvisibility=hidden)
-    target_link_options(${PROJECT_NAME} PRIVATE -s)
-    target_link_libraries(${PROJECT_NAME} ${TESSERACT_LIBRARIES} ${EXTRA_LIBRARIES})
+	target_link_libraries(${PROJECT_NAME} -static -force_load ${TESSERACT_LIBRARIES} pthread)
 ELSE()
-    target_compile_options(${PROJECT_NAME} PRIVATE -O3 -fvisibility=hidden)
-    target_link_options(${PROJECT_NAME} PRIVATE -s)
-    target_link_libraries(${PROJECT_NAME} -Wl,--whole-archive ${TESSERACT_LIBRARIES} -Wl,--no-whole-archive ${EXTRA_LIBRARIES})
+	target_link_libraries(${PROJECT_NAME} -static-libgcc -static-libstdc++ -Wl,--whole-archive ${TESSERACT_LIBRARIES} -Wl,--no-whole-archive pthread)
 ENDIF()
-
-# ---------------------------- OUTPUT NAME ------------------------
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "lib")
-set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".binary")
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract")
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract64")
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "tesseract32")
+endif()
