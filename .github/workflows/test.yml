@@ -1,0 +1,65 @@
+name: test
+
+on:
+  workflow_run:
+    workflows: [windows-build]
+    types:
+      - completed   
+    branches:
+      - '**' 
+
+jobs:
+  test:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - os: windows-latest
+            name: Windows 64
+            laz-url: https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.4/lazarus-2.2.4-fpc-3.2.2-win64.exe
+            
+          - os: windows-latest
+            name: Windows 32
+            laz-url: https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2032%20bits/Lazarus%202.2.4/lazarus-2.2.4-fpc-3.2.2-win32.exe
+
+    steps:
+      - name: Download artifacts
+        uses: actions/github-script@v3.1.0
+        with:
+          script: |
+            var fs = require('fs');
+            var artifacts = await github.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{ github.event.workflow_run.id }},
+            });
+            for (artifact of artifacts.data.artifacts) {
+              var download = await github.actions.downloadArtifact({
+                 owner: context.repo.owner,
+                 repo: context.repo.repo,
+                 artifact_id: artifact.id,
+                 archive_format: 'zip',
+              });
+              fs.writeFileSync(artifact.name, Buffer.from(download.data));
+              console.log('Downloaded: ' + artifact.name);
+            }
+
+      - name: Install Lazarus
+        uses: ollydev/setup-lazarus@v3.2
+        with:
+          laz-url: ${{ matrix.config.laz-url }}
+          fpc-url: ${{ matrix.config.fpc-url }}
+      
+      - name: Test Installation
+        run: |
+          lazbuild --version
+          ls
+
+      - name: Build
+        run: |
+          lazbuild test/test.lpi
