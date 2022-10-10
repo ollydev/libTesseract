@@ -1,0 +1,85 @@
+name: linux
+on: push
+
+jobs:
+  build:
+    name: Build ${{ matrix.binary }}
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - binary: libtesseract64.so
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y g++-10 autoconf ninja-build
+    
+    - name: Build Leptonica
+      run: |
+        echo "Building leptonica..."
+        git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
+        cd leptonica
+        ./autogen.sh
+        ./configure '--with-pic' '--disable-shared' '--without-libpng' '--without-zlib' '--without-jpeg' '--without-libtiff' '--without-giflib' '--without-libwebp' '--without-libwebpmux' '--without-libopenjpeg' '--disable-programs' 'CXX=g++-10' 'CFLAGS=-D DEFAULT_SEVERITY=L_SEVERITY_ERROR -g0 -O3'
+        make
+        sudo make install
+
+    - name: Build Tesseract
+      run: |
+        echo "Building Tesseract..."
+        git clone --depth 1 --branch 5.2.0 https://github.com/tesseract-ocr/tesseract.git
+        cd tesseract
+        ./autogen.sh
+        ./configure '--with-pic' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CXX=g++-10' 'CXXFLAGS=-DTESS_EXPORTS -g0 -O3 -ffast-math'
+        make
+        sudo make install install
+
+    - name: Build Library
+      run: |
+        mkdir -p build
+        cmake -S . -B build -G Ninja
+        cmake --build build --config Release
+           
+    - name: Print Library Dependencies  
+      run: |
+        ldd build/${{ matrix.binary }}        
+           
+    - uses: actions/upload-artifact@v3.1.0
+      with:
+          name: ${{ matrix.binary }}
+          path: build/${{ matrix.binary }}
+          retention-days: 5
+
+  test:
+    name: Test ${{ matrix.binary }}
+    runs-on: ubuntu-20.04
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - binary: libtesseract64.so
+            laz-url: https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.2.4/lazarus-project_2.2.4-0_amd64.deb
+            fpc-url: |
+              https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.2.4/fpc-laz_3.2.2-210709_amd64.deb
+              https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.2.4/fpc-src_3.2.2-210709_amd64.deb
+
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.binary }}
+
+    - name: Install Lazarus
+      uses: ollydev/setup-lazarus@v3.2
+      with:
+        laz-url: ${{ matrix.laz-url }}
+        fpc-url: ${{ matrix.fpc-url }}
+
+    - name: Test
+      run: |
+        lazbuild test/test.lpi
+        test/test ${{ matrix.binary }} 5.2.0

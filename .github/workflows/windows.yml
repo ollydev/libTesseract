@@ -1,0 +1,111 @@
+name: windows
+on: push
+
+jobs:
+  build:
+    name: Build ${{ matrix.binary }}
+    runs-on: windows-2019
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+           - msystem: MINGW32
+             mingw_package_prefix: mingw-w64-i686      
+             binary: libtesseract32.dll
+
+           - msystem: MINGW64
+             mingw_package_prefix: mingw-w64-x86_64
+             binary: libtesseract64.dll
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v3.1.0
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ matrix.msystem }}
+        install: >-
+          autoconf 
+          automake 
+          automake-wrapper 
+          git 
+          libtool 
+          make
+        pacboy: >-
+          toolchain:p
+          cmake:p
+          ninja:p
+    
+    - name: Install gcc
+      run: |
+           pacman --noconfirm -S ${{ matrix.mingw_package_prefix }}-gcc
+           pacman --noconfirm -S ${{ matrix.mingw_package_prefix }}-gcc-libs
+
+    - name: Build Leptonica
+      run: |
+        echo "Building leptonica..."
+        git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
+        cd leptonica
+        ./autogen.sh
+        ./configure '--with-pic' '--disable-shared' '--without-libpng' '--without-zlib' '--without-jpeg' '--without-libtiff' '--without-giflib' '--without-libwebp' '--without-libwebpmux' '--without-libopenjpeg' '--disable-programs' 'CXX=${{ matrix.config.cxx }}' 'CFLAGS=-D DEFAULT_SEVERITY=L_SEVERITY_ERROR -g0 -O3'
+        make
+        make install
+
+    - name: Build Tesseract
+      run: |
+        echo "Building Tesseract..."
+        git clone --depth 1 --branch 5.2.0 https://github.com/tesseract-ocr/tesseract.git
+        cd tesseract
+        sed -e "s/tesseract_LDADD += -ltiff//g" -i makefile.am
+        ./autogen.sh
+        ./configure '--with-pic' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CXX=${{ matrix.config.cxx }}' 'CXXFLAGS=-DTESS_EXPORTS -DTESSERACT_DISABLE_DEBUG_FONTS -g0 -O3 -ffast-math'
+        make
+        make install install
+     
+    - name: Build Library
+      run: |
+        mkdir -p build
+        cmake -S . -B build -G Ninja
+        cmake --build build --config Release
+           
+    - name: Print Dependencies  
+      run: |
+        ldd build/${{ matrix.binary }}  
+
+    - uses: actions/upload-artifact@v3.1.0
+      with:
+          name: ${{ matrix.binary }}
+          path: build/${{ matrix.binary }}
+          retention-days: 5    
+
+  test:
+    name: Test ${{ matrix.binary }}
+    runs-on: windows-2019
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - binary: libtesseract64.dll
+            laz-url: https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Lazarus%202.2.4/lazarus-2.2.4-fpc-3.2.2-win64.exe
+
+          - binary: libtesseract32.dll
+            laz-url: https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2032%20bits/Lazarus%202.2.4/lazarus-2.2.4-fpc-3.2.2-win32.exe
+
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.binary }}
+
+    - name: Install Lazarus
+      uses: ollydev/setup-lazarus@v3.2
+      with:
+        laz-url: ${{ matrix.laz-url }}
+        fpc-url: ${{ matrix.fpc-url }}
+
+    - name: Test
+      run: |
+        lazbuild test/test.lpi
+        test/test.exe ${{ matrix.binary }} 5.2.0

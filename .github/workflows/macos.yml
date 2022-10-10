@@ -1,0 +1,85 @@
+name: macos
+on: push
+
+jobs:
+  build:
+    name: Build ${{ matrix.binary }}
+    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - binary: libtesseract64.dylib
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - name: Install Dependencies
+        run: |
+          brew install autoconf automake ninja libtool 
+      
+      - name: Install Leptonica
+        run: |
+          echo "Building leptonica..."
+          git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
+          cd leptonica
+          ./autogen.sh
+          ./configure '--with-pic' '--disable-shared' '--without-libpng' '--without-zlib' '--without-jpeg' '--without-libtiff' '--without-giflib' '--without-libwebp' '--without-libwebpmux' '--without-libopenjpeg' '--disable-programs' 'CXX=clang++' 'CFLAGS=-D DEFAULT_SEVERITY=L_SEVERITY_ERROR -g0 -O3 -mmacosx-version-min=10.13'
+          make
+          sudo make install
+
+      - name: Install Tesseract
+        run: |
+          echo "Building Tesseract..."
+          git clone --depth 1 --branch 5.2.0 https://github.com/tesseract-ocr/tesseract.git
+          cd tesseract
+          ./autogen.sh
+          ./configure '--with-pic' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CXX=clang++' 'CXXFLAGS=-DTESS_EXPORTS -g0 -O3 -ffast-math -mmacosx-version-min=10.13'
+          make
+          sudo make install install
+
+      - name: Build Library
+        run: |
+          mkdir -p build
+          cmake -S . -B build -G Ninja
+          cmake --build build --config Release
+             
+      - name: Print Library Dependencies  
+        run: |
+          otool -L build/${{ matrix.binary }} 
+
+      - uses: actions/upload-artifact@v3.1.0
+        with:
+          name: ${{ matrix.binary }}
+          path: build/${{ matrix.binary }}
+          retention-days: 5                  
+             
+  test:
+    name: Test ${{ matrix.binary }}
+    runs-on: macos-12
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - binary: libtesseract64.dylib
+            laz-url: https://sourceforge.net/projects/lazarus/files/Lazarus%20macOS%20x86-64/Lazarus%202.2.4/Lazarus-2.2.4-0-x86_64-macosx.pkg
+            fpc-url: |
+              https://sourceforge.net/projects/lazarus/files/Lazarus%20macOS%20x86-64/Lazarus%202.2.4/fpc-3.2.2.intelarm64-macosx.dmg
+              https://sourceforge.net/projects/lazarus/files/Lazarus%20macOS%20x86-64/Lazarus%202.2.4/fpc-src-3.2.2-20210709-macosx.dmg
+
+    steps:
+    - uses: actions/checkout@v3.1.0
+    - uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.binary }}
+
+    - name: Install Lazarus
+      uses: ollydev/setup-lazarus@v3.2
+      with:
+        laz-url: ${{ matrix.laz-url }}
+        fpc-url: ${{ matrix.fpc-url }}
+
+    - name: Test
+      run: |
+        lazbuild test/test.lpi
+        test/test ${{ matrix.binary }} 5.2.0
