@@ -1,0 +1,58 @@
+name: macos-aarch64
+on: push
+
+env:
+  TESSERACT_VERSION: 5.3.1 
+
+jobs:
+  build:
+    name: Build ${{ matrix.binary }}
+    runs-on: macos-12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - binary: libtesseract.dylib.aarch64
+    steps:
+      - uses: actions/checkout@v3.1.0
+
+      - name: Install Dependencies
+        run: |
+          brew install autoconf automake ninja libtool 
+      
+      - name: Install Leptonica
+        run: |
+          echo "Building leptonica..."
+          git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
+          cd leptonica
+          ./autogen.sh
+          ./configure '--host=aarch64-apple-darwin' '--with-pic' '--disable-shared' '--without-libpng' '--without-zlib' '--without-jpeg' '--without-libtiff' '--without-giflib' '--without-libwebp' '--without-libwebpmux' '--without-libopenjpeg' '--disable-programs' 'CXX=clang++' 'CFLAGS=-D DEFAULT_SEVERITY=L_SEVERITY_ERROR -g0 -O3 -target arm64-apple-macos11 -mmacosx-version-min=10.13'
+          make
+          sudo make install
+
+      - name: Install Tesseract
+        run: |
+          echo "Building Tesseract..."
+          git clone --depth 1 --branch ${{ env.TESSERACT_VERSION }} https://github.com/tesseract-ocr/tesseract.git
+          cd tesseract
+          ./autogen.sh
+          ./configure '--host=aarch64-apple-darwin' '--with-pic' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CXX=clang++' 'CXXFLAGS=-DTESS_EXPORTS -g0 -O3 -ffast-math -target arm64-apple-macos11 -mmacosx-version-min=10.13'
+          make
+          sudo make install install
+
+      - name: Build Library
+        run: |
+          mkdir -p build
+          cmake -S . -B build -DCMAKE_CXX_FLAGS="-target arm64-apple-macos11" -DCMAKE_SYSTEM_NAME=Darwin -G Ninja
+          cmake --build build --config Release
+          mv build/libtesseract64.dylib build/libtesseract.dylib.aarch64
+             
+      - name: Print Library Dependencies  
+        run: |
+          otool -L build/${{ matrix.binary }} 
+
+      - uses: actions/upload-artifact@v3.1.0
+        with:
+          name: ${{ matrix.binary }}
+          path: build/${{ matrix.binary }}
+          retention-days: 5
