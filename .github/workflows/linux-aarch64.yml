@@ -1,6 +1,9 @@
 name: linux-aarch64
 on: push
 
+env:
+  TESSERACT_VERSION: 5.3.1
+
 jobs:
   build:
     name: Build ${{ matrix.binary }}
@@ -30,7 +33,7 @@ jobs:
     - name: Build Tesseract
       run: |
         echo "Building Tesseract..."
-        git clone --depth 1 --branch 5.2.0 https://github.com/tesseract-ocr/tesseract.git
+        git clone --depth 1 --branch ${{ env.TESSERACT_VERSION }} https://github.com/tesseract-ocr/tesseract.git
         cd tesseract
         ./autogen.sh
         ./configure '--host=aarch64-linux' '--with-pic' '--enable-visibility' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CC=aarch64-linux-gnu-gcc-10' 'CXX=aarch64-linux-gnu-g++-10' 'CXXFLAGS=-g0 -O3 -ffast-math'
