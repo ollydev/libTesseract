@@ -39,6 +39,9 @@ static const char* PascalExports[] =
 	(char*)"Tesseract_Delete",            (char*)"procedure Tesseract_Delete(var Tesseract: Pointer);",
 	(char*)"Tesseract_Init",              (char*)"function Tesseract_Init(Tesseract: Pointer; DataPath, Language: String): Integer;",
 	(char*)"Tesseract_End",               (char*)"procedure Tesseract_End(var Tesseract: Pointer);",
+	(char*)"Tesseract_SetPageSegMode",    (char*)"procedure Tesseract_SetPageSegMode(Tesseract: Pointer; Mode: Int32);",
+	(char*)"Tesseract_GetPageSegMode",    (char*)"function Tesseract_GetPageSegMode(Tesseract: Pointer): Int32;",
+	(char*)"Tesseract_MeanTextConf",      (char*)"function Tesseract_MeanTextConf(Tesseract: Pointer): Single;",
 	(char*)"Tesseract_SetImage",          (char*)"procedure Tesseract_SetImage(Tesseract: Pointer; const ImageData: Pointer; Width, Height, BytesPerPixel, BytesPerLine: Integer);",
 	(char*)"Tesseract_GetUTF8Text",       (char*)"function Tesseract_GetUTF8Text(Tesseract: Pointer; var Len: Int32): PChar;",
 	(char*)"Tesseract_FreeUTF8Text",      (char*)"procedure Tesseract_FreeUTF8Text(var Text: PChar);",
@@ -68,6 +71,9 @@ extern "C"
 	EXPORT void Tesseract_Delete(tesseract::TessBaseAPI* &tesseract_ptr);
 	EXPORT int Tesseract_Init(tesseract::TessBaseAPI* tesseract_ptr, const char* datapath, const char* language);
 	EXPORT void Tesseract_End(tesseract::TessBaseAPI* &tesseract_ptr);
+	EXPORT void Tesseract_SetPageSegMode(tesseract::TessBaseAPI* tesseract_ptr, int mode);
+	EXPORT int Tesseract_GetPageSegMode(tesseract::TessBaseAPI* tesseract_ptr);
+	EXPORT float Tesseract_MeanTextConf(tesseract::TessBaseAPI* tesseract_ptr);
 	EXPORT void Tesseract_SetImage(tesseract::TessBaseAPI* tesseract_ptr, const unsigned char* imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line);
 	EXPORT const char* Tesseract_GetUTF8Text(tesseract::TessBaseAPI* tesseract_ptr, int* len);
 	EXPORT void Tesseract_FreeUTF8Text(char* &utf8_text_ptr);

@@ -38,6 +38,21 @@ void Tesseract_End(tesseract::TessBaseAPI* &tesseract_ptr)
 	tesseract_ptr->End();
 }
 
+void Tesseract_SetPageSegMode(tesseract::TessBaseAPI* tesseract_ptr, int mode)
+{
+	tesseract_ptr->SetPageSegMode(static_cast<tesseract::PageSegMode>(mode));
+}
+
+int Tesseract_GetPageSegMode(tesseract::TessBaseAPI* tesseract_ptr)
+{
+	return static_cast<int>(tesseract_ptr->GetPageSegMode());
+}
+
+float Tesseract_MeanTextConf(tesseract::TessBaseAPI* tesseract_ptr)
+{
+	return tesseract_ptr->MeanTextConf();
+}
+
 void Tesseract_SetImage(tesseract::TessBaseAPI* tesseract_ptr, const unsigned char* imagedata, int width, int height, int bytes_per_pixel, int bytes_per_line)
 {
 	tesseract_ptr->SetImage(imagedata, width, height, bytes_per_pixel, bytes_per_line);
