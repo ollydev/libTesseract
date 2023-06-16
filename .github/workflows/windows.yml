@@ -1,6 +1,9 @@
 name: windows
 on: push
 
+env:
+  TESSERACT_VERSION: 5.3.1
+
 jobs:
   build:
     name: Build ${{ matrix.binary }}
@@ -55,7 +58,7 @@ jobs:
     - name: Build Tesseract
       run: |
         echo "Building Tesseract..."
-        git clone --depth 1 --branch 5.2.0 https://github.com/tesseract-ocr/tesseract.git
+        git clone --depth 1 --branch ${{ env.TESSERACT_VERSION }} https://github.com/tesseract-ocr/tesseract.git
         cd tesseract
         sed -e "s/tesseract_LDADD += -ltiff//g" -i makefile.am
         ./autogen.sh
@@ -108,4 +111,4 @@ jobs:
     - name: Test
       run: |
         lazbuild test/test.lpi
-        test/test.exe ${{ matrix.binary }} 5.2.0
+        test/test.exe ${{ matrix.binary }} ${{ env.TESSERACT_VERSION }}

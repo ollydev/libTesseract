@@ -1,6 +1,9 @@
 name: macos
 on: push
 
+env:
+  TESSERACT_VERSION: 5.3.1 
+
 jobs:
   build:
     name: Build ${{ matrix.binary }}
@@ -30,7 +33,7 @@ jobs:
       - name: Install Tesseract
         run: |
           echo "Building Tesseract..."
-          git clone --depth 1 --branch 5.2.0 https://github.com/tesseract-ocr/tesseract.git
+          git clone --depth 1 --branch ${{ env.TESSERACT_VERSION }} https://github.com/tesseract-ocr/tesseract.git
           cd tesseract
           ./autogen.sh
           ./configure '--with-pic' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CXX=clang++' 'CXXFLAGS=-DTESS_EXPORTS -g0 -O3 -ffast-math -mmacosx-version-min=10.13'
@@ -82,4 +85,4 @@ jobs:
     - name: Test
       run: |
         lazbuild test/test.lpi
-        test/test ${{ matrix.binary }} 5.2.0
+        test/test ${{ matrix.binary }} ${{ env.TESSERACT_VERSION }}
