@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - binary: libtesseract64.so.aarch64
+          - binary: libtesseract.so.aarch64
     steps:
     - uses: actions/checkout@v3.1.0
     - name: Install Dependencies
@@ -43,9 +43,10 @@ jobs:
     - name: Build Library
       run: |
         mkdir -p build
-        cmake -S . -B build  -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++-10 -G Ninja
+        cmake -S . -B build -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++-10 -G Ninja
         cmake --build build --config Release
-           
+        mv build/libtesseract64.so build/libtesseract.so.aarch64 
+
     - uses: actions/upload-artifact@v3.1.0
       with:
           name: ${{ matrix.binary }}
