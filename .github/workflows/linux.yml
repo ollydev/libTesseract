@@ -2,7 +2,7 @@ name: linux
 on: push
 
 env:
-  TESSERACT_VERSION: 5.3.1
+  TESSERACT_VERSION: 5.3.3
 
 jobs:
   build:
