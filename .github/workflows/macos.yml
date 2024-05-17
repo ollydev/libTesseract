@@ -14,7 +14,7 @@ jobs:
         include:
           - binary: libtesseract64.dylib
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v4.1.6
 
       - name: Install Dependencies
         run: |
@@ -50,7 +50,7 @@ jobs:
         run: |
           otool -L build/${{ matrix.binary }} 
 
-      - uses: actions/upload-artifact@v3.1.0
+      - uses: actions/upload-artifact@v4.3.3
         with:
           name: ${{ matrix.binary }}
           path: build/${{ matrix.binary }}
@@ -71,8 +71,8 @@ jobs:
               https://sourceforge.net/projects/lazarus/files/Lazarus%20macOS%20x86-64/Lazarus%202.2.4/fpc-src-3.2.2-20210709-macosx.dmg
 
     steps:
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/download-artifact@v3
+    - uses: actions/checkout@v4.1.6
+    - uses: actions/download-artifact@v4
       with:
         name: ${{ matrix.binary }}
 

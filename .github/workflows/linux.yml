@@ -14,7 +14,7 @@ jobs:
         include:
           - binary: libtesseract64.so
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v4.1.6
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -50,7 +50,7 @@ jobs:
       run: |
         ldd build/${{ matrix.binary }}        
            
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v4.3.3
       with:
           name: ${{ matrix.binary }}
           path: build/${{ matrix.binary }}
@@ -71,8 +71,8 @@ jobs:
               https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.2.4/fpc-src_3.2.2-210709_amd64.deb
 
     steps:
-    - uses: actions/checkout@v3.1.0
-    - uses: actions/download-artifact@v3
+    - uses: actions/checkout@v4.1.6
+    - uses: actions/download-artifact@v4
       with:
         name: ${{ matrix.binary }}
 

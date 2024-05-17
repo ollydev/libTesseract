@@ -14,7 +14,7 @@ jobs:
         include:
           - binary: libtesseract.dylib.aarch64
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v4.1.6
 
       - name: Install Dependencies
         run: |
@@ -51,7 +51,7 @@ jobs:
         run: |
           otool -L build/${{ matrix.binary }} 
 
-      - uses: actions/upload-artifact@v3.1.0
+      - uses: actions/upload-artifact@v4.3.3
         with:
           name: ${{ matrix.binary }}
           path: build/${{ matrix.binary }}

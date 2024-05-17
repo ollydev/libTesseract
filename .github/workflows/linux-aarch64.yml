@@ -14,7 +14,7 @@ jobs:
         include:
           - binary: libtesseract.so.aarch64
     steps:
-    - uses: actions/checkout@v3.1.0
+    - uses: actions/checkout@v4.1.6
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -47,7 +47,7 @@ jobs:
         cmake --build build --config Release
         mv build/libtesseract64.so build/libtesseract.so.aarch64 
 
-    - uses: actions/upload-artifact@v3.1.0
+    - uses: actions/upload-artifact@v4.3.3
       with:
           name: ${{ matrix.binary }}
           path: build/${{ matrix.binary }}
