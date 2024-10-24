@@ -7,14 +7,14 @@ env:
 jobs:
   build:
     name: Build ${{ matrix.binary }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         include:
           - binary: libtesseract64.so
     steps:
-    - uses: actions/checkout@v4.1.6
+    - uses: actions/checkout@v4.1.7
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -58,7 +58,7 @@ jobs:
 
   test:
     name: Test ${{ matrix.binary }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     needs: build
     strategy:
       fail-fast: false
@@ -71,13 +71,13 @@ jobs:
               https://sourceforge.net/projects/lazarus/files/Lazarus%20Linux%20amd64%20DEB/Lazarus%202.2.4/fpc-src_3.2.2-210709_amd64.deb
 
     steps:
-    - uses: actions/checkout@v4.1.6
+    - uses: actions/checkout@v4.1.7
     - uses: actions/download-artifact@v4
       with:
         name: ${{ matrix.binary }}
 
     - name: Install Lazarus
-      uses: ollydev/setup-lazarus@v3.2
+      uses: ollydev/setup-lazarus@v3.3
       with:
         laz-url: ${{ matrix.laz-url }}
         fpc-url: ${{ matrix.fpc-url }}

@@ -77,7 +77,7 @@ jobs:
         name: ${{ matrix.binary }}
 
     - name: Install Lazarus
-      uses: ollydev/setup-lazarus@v3.2
+      uses: ollydev/setup-lazarus@v3.3
       with:
         laz-url: ${{ matrix.laz-url }}
         fpc-url: ${{ matrix.fpc-url }}

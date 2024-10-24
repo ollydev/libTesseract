@@ -7,48 +7,49 @@ env:
 jobs:
   build:
     name: Build ${{ matrix.binary }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         include:
           - binary: libtesseract.so.aarch64
     steps:
-    - uses: actions/checkout@v4.1.6
-    - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-10-aarch64-linux-gnu g++-10-aarch64-linux-gnu pkg-config-aarch64-linux-gnu binutils-aarch64-linux-gnu autoconf ninja-build
-    
-    - name: Build Leptonica
-      run: |
-        echo "Building leptonica..."
-        git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
-        cd leptonica
-        ./autogen.sh
-        ./configure '--host=aarch64-linux' '--with-pic' '--disable-shared' '--without-libpng' '--without-zlib' '--without-jpeg' '--without-libtiff' '--without-giflib' '--without-libwebp' '--without-libwebpmux' '--without-libopenjpeg' '--disable-programs' 'CC=aarch64-linux-gnu-gcc-10' 'CXX=aarch64-linux-gnu-g++-10' 'CFLAGS=-D DEFAULT_SEVERITY=L_SEVERITY_ERROR -g0 -O3'
-        make
-        sudo make install
+      - uses: actions/checkout@v4.1.7
+      
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-11-aarch64-linux-gnu g++-11-aarch64-linux-gnu binutils-aarch64-linux-gnu autoconf ninja-build
+      
+      - name: Build Leptonica
+        run: |
+          echo "Building leptonica..."
+          git clone --depth 1 https://github.com/DanBloomberg/leptonica.git
+          cd leptonica
+          ./autogen.sh
+          ./configure '--host=aarch64-linux' '--with-pic' '--disable-shared' '--without-libpng' '--without-zlib' '--without-jpeg' '--without-libtiff' '--without-giflib' '--without-libwebp' '--without-libwebpmux' '--without-libopenjpeg' '--disable-programs' 'CC=aarch64-linux-gnu-gcc-11' 'CXX=aarch64-linux-gnu-g++-11' 'CFLAGS=-D DEFAULT_SEVERITY=L_SEVERITY_ERROR -g0 -O3'
+          make
+          sudo make install
 
-    - name: Build Tesseract
-      run: |
-        echo "Building Tesseract..."
-        git clone --depth 1 --branch ${{ env.TESSERACT_VERSION }} https://github.com/tesseract-ocr/tesseract.git
-        cd tesseract
-        ./autogen.sh
-        ./configure '--host=aarch64-linux' '--with-pic' '--enable-visibility' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CC=aarch64-linux-gnu-gcc-10' 'CXX=aarch64-linux-gnu-g++-10' 'CXXFLAGS=-g0 -O3 -ffast-math'
-        make
-        sudo make install install
+      - name: Build Tesseract
+        run: |
+          echo "Building Tesseract..."
+          git clone --depth 1 --branch ${{ env.TESSERACT_VERSION }} https://github.com/tesseract-ocr/tesseract.git
+          cd tesseract
+          ./autogen.sh
+          ./configure '--host=aarch64-linux' '--with-pic' '--enable-visibility' '--disable-shared' '--disable-legacy' '--disable-graphics' '--disable-openmp' '--without-curl' '--without-archive' '--disable-doc' 'CC=aarch64-linux-gnu-gcc-11' 'CXX=aarch64-linux-gnu-g++-11' 'CXXFLAGS=-g0 -O3 -ffast-math'
+          make
+          sudo make install install
 
-    - name: Build Library
-      run: |
-        mkdir -p build
-        cmake -S . -B build -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc-10 -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++-10 -G Ninja
-        cmake --build build --config Release
-        mv build/libtesseract64.so build/libtesseract.so.aarch64 
+      - name: Build Library
+        run: |
+          mkdir -p build
+          cmake -S . -B build -DCMAKE_SYSTEM_NAME=Linux -DCMAKE_SYSTEM_PROCESSOR=aarch64 -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc-11 -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++-11 -G Ninja
+          cmake --build build --config Release
+          mv build/libtesseract64.so build/libtesseract.so.aarch64 
 
-    - uses: actions/upload-artifact@v4.3.3
-      with:
-          name: ${{ matrix.binary }}
-          path: build/${{ matrix.binary }}
-          retention-days: 5
+      - uses: actions/upload-artifact@v4.3.3
+        with:
+            name: ${{ matrix.binary }}
+            path: build/${{ matrix.binary }}
+            retention-days: 5
